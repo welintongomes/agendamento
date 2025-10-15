@@ -676,6 +676,120 @@
                 flex-direction: row;
             }
         }
+        /* ==================== CATEGORIAS DA GALERIA ==================== */
+.gallery-category {
+    margin-bottom: 15px;
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.gallery-category:hover {
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+}
+
+.category-header {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 20px 25px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: background 0.3s ease;
+    user-select: none;
+}
+
+.category-header:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.category-header:hover h3,
+.category-header:hover .category-count,
+.category-header:hover .category-arrow {
+    color: white;
+}
+
+.category-header h3 {
+    margin: 0;
+    flex: 1;
+    font-size: 1.2rem;
+    color: #333;
+    transition: color 0.3s ease;
+}
+
+.category-count {
+    background: rgba(102, 126, 234, 0.2);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: #667eea;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.category-header:hover .category-count {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.category-arrow {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease, color 0.3s ease;
+    color: #667eea;
+}
+
+.category-arrow.open {
+    transform: rotate(180deg);
+}
+
+.category-images {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    padding: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    background: #fafafa;
+}
+
+.category-images.open {
+    max-height: 2000px;
+    padding: 25px;
+}
+
+/* Ajustar o grid principal para categorias */
+.gallery-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding: 30px;
+}
+
+/* Responsivo para categorias */
+@media (max-width: 768px) {
+    .category-header {
+        padding: 15px 20px;
+        flex-wrap: wrap;
+    }
+    
+    .category-header h3 {
+        font-size: 1rem;
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .category-images {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+    }
+    
+    .category-images.open {
+        padding: 15px;
+    }
+}
+
     </style>
 </head>
 
@@ -823,15 +937,46 @@
         // ==================== CONFIGURAÇÃO DA GALERIA ====================
 // ADICIONE AQUI AS SUAS IMAGENS
 // Coloque as imagens na pasta raiz do GitHub (ex: imagem1.jpg, imagem2.jpg)
-const galleryImages = [
-    { src: 'trabalho1.jpg', caption: 'Polimento Técnico - Sedan Preto' },
-    { src: 'trabalho2.jpg', caption: 'Cristalização Completa - SUV Branco' },
-    { src: 'trabalho3.jpg', caption: 'Lavagem Premium - Hatch Vermelho' },
-    { src: 'trabalho4.jpg', caption: 'Higienização Interna - Sedan Prata' },
-    { src: 'trabalho5.jpg', caption: 'Vitrificação - SUV Azul' },
-    { src: 'trabalho6.jpg', caption: 'Polimento e Cristalização - Sedan Branco' },
-    // Adicione mais imagens aqui seguindo o mesmo formato
+// ==================== CONFIGURAÇÃO DA GALERIA ====================
+const galleryCategories = [
+    {
+        id: 'polimento',
+        name: '✨ Polimento e Cristalização',
+        images: [
+            { src: './polimento1.jpg', caption: 'Polimento Técnico - Sedan Preto' },
+            { src: './polimento2.jpg', caption: 'Cristalização Completa - SUV Branco' }
+            //{ src: './polimento3.jpg', caption: 'Polimento + Cristalização - Hatch' }
+        ]
+    },
+    {
+        id: 'lavagem',
+        name: '🚿 Lavagem Premium',
+        images: [
+            { src: './lavagem1.jpg', caption: 'Lavagem Externa Completa' },
+            { src: './lavagem2.jpg', caption: 'Lavagem + Cera - SUV' }
+            //{ src: './lavagem3.jpg', caption: 'Lavagem Detalhada - Sedan' }
+        ]
+    },
+    {
+        id: 'interna',
+        name: '🧼 Higienização Interna',
+        images: [
+            { src: './interna1.jpg', caption: 'Higienização Completa - Interior' }
+            //{ src: './interna2.jpg', caption: 'Limpeza de Bancos - Couro' },
+            //{ src: './interna3.jpg', caption: 'Aspiração e Aromatização' }
+        ]
+    },
+    {
+        id: 'motor',
+        name: '🔧 Lavagem de Motor',
+        images: [
+            { src: './motor1.jpg', caption: 'Lavagem de Motor - Antes e Depois' }
+            //{ src: './motor2.jpg', caption: 'Motor Limpo e Protegido' }
+        ]
+    }
 ];
+
+let activeCategory = null;
 
 // ==================== FUNÇÕES DA GALERIA ====================
 function toggleGallery() {
@@ -841,19 +986,55 @@ function toggleGallery() {
     content.classList.toggle('open');
     toggle.classList.toggle('open');
 }
+function toggleCategory(categoryId) {
+    const categoryImages = document.getElementById(`category-${categoryId}`);
+    const arrow = document.getElementById(`arrow-${categoryId}`);
+    
+    if (activeCategory === categoryId) {
+        // Fechar categoria ativa
+        categoryImages.classList.remove('open');
+        arrow.classList.remove('open');
+        activeCategory = null;
+    } else {
+        // Fechar todas as outras categorias
+        document.querySelectorAll('.category-images').forEach(cat => {
+            cat.classList.remove('open');
+        });
+        document.querySelectorAll('.category-arrow').forEach(arr => {
+            arr.classList.remove('open');
+        });
+        
+        // Abrir categoria selecionada
+        categoryImages.classList.add('open');
+        arrow.classList.add('open');
+        activeCategory = categoryId;
+    }
+}
 
 function renderGallery() {
     const grid = document.getElementById('galleryGrid');
     
-    if (galleryImages.length === 0) {
-        grid.innerHTML = '<p style="text-align: center; color: #999; padding: 40px; grid-column: 1/-1;">Nenhuma imagem disponível no momento.</p>';
+    if (galleryCategories.length === 0) {
+        grid.innerHTML = '<p style="text-align: center; color: #999; padding: 40px; grid-column: 1/-1;">📷 Em breve adicionaremos fotos dos nossos trabalhos!</p>';
         return;
     }
     
-    grid.innerHTML = galleryImages.map((img, index) => `
-        <div class="gallery-item" onclick="openModal('${img.src}', '${img.caption}')">
-            <img src="${img.src}" alt="${img.caption}" loading="lazy">
-            <div class="gallery-item-caption">${img.caption}</div>
+    // Renderizar categorias
+    grid.innerHTML = galleryCategories.map(category => `
+        <div class="gallery-category">
+            <div class="category-header" onclick="toggleCategory('${category.id}')">
+                <h3>${category.name}</h3>
+                <span class="category-count">${category.images.length} ${category.images.length === 1 ? 'foto' : 'fotos'}</span>
+                <span class="category-arrow" id="arrow-${category.id}">▼</span>
+            </div>
+            <div class="category-images" id="category-${category.id}">
+                ${category.images.map(img => `
+                    <div class="gallery-item" onclick="openModal('${img.src}', '${img.caption}')">
+                        <img src="${img.src}" alt="${img.caption}" loading="lazy" onerror="this.parentElement.style.display='none'">
+                        <div class="gallery-item-caption">${img.caption}</div>
+                    </div>
+                `).join('')}
+            </div>
         </div>
     `).join('');
 }
