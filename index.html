@@ -1337,9 +1337,8 @@ function renderSlider() {
         </div>
     `).join('');
     
-    // Renderizar dots
-    const totalDots = Math.ceil(sliderImages.length / slidesPerView);
-    dots.innerHTML = Array.from({ length: totalDots }, (_, i) => 
+    // Renderizar dots - UMA BOLINHA POR IMAGEM
+    dots.innerHTML = Array.from({ length: sliderImages.length }, (_, i) => 
         `<span class="dot ${i === 0 ? 'active' : ''}" onclick="goToSlide(${i})"></span>`
     ).join('');
     
