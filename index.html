@@ -1337,8 +1337,10 @@ function renderSlider() {
         </div>
     `).join('');
     
-    // Renderizar dots - UMA BOLINHA POR IMAGEM
-    dots.innerHTML = Array.from({ length: sliderImages.length }, (_, i) => 
+    // Renderizar dots baseado nas posições possíveis
+    const maxPosition = Math.max(0, sliderImages.length - slidesPerView);
+    const totalDots = maxPosition + 1;
+    dots.innerHTML = Array.from({ length: totalDots }, (_, i) => 
         `<span class="dot ${i === 0 ? 'active' : ''}" onclick="goToSlide(${i})"></span>`
     ).join('');
     
@@ -1349,9 +1351,10 @@ function updateSlidePosition() {
     const track = document.getElementById('sliderTrack');
     if (!track) return;
     
-    const slideWidth = 100 / slidesPerView;
-    const offset = -currentSlide * slideWidth;
-    track.style.transform = `translateX(${offset}%)`;
+    const slideWidth = track.firstElementChild ? track.firstElementChild.offsetWidth : 0;
+    const gap = 15; // mesmo valor do CSS
+    const offset = -(currentSlide * (slideWidth + gap));
+    track.style.transform = `translateX(${offset}px)`;
     
     // Atualizar dots
     document.querySelectorAll('.dot').forEach((dot, index) => {
