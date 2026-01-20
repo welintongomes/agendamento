@@ -1348,33 +1348,34 @@
         }
 
         function updateSlidePosition() {
-            const track = document.getElementById('sliderTrack');
-            if (!track) return;
-
-            const slideWidth = 100 / slidesPerView;
-            const maxOffset = ((sliderImages.length - slidesPerView) / slidesPerView) * 100;
-            const offset = Math.min(-currentSlide * slideWidth, -maxOffset);
-            track.style.transform = `translateX(${offset}%)`;
-
-            // Atualizar dots
-            document.querySelectorAll('.dot').forEach((dot, index) => {
-                dot.classList.toggle('active', index === currentSlide);
-            });
-        }
+    const track = document.getElementById('sliderTrack');
+    if (!track) return;
+    
+    const itemWidth = 100 / slidesPerView;
+    const offset = -(currentSlide * itemWidth);
+    track.style.transform = `translateX(${offset}%)`;
+    
+    // Atualizar dots
+    document.querySelectorAll('.dot').forEach((dot, index) => {
+        dot.classList.toggle('active', index === currentSlide);
+    });
+}
 
         function moveSlide(direction) {
-            const maxSlide = sliderImages.length - slidesPerView;
-            currentSlide += direction;
-
-            if (currentSlide < 0) {
-                currentSlide = maxSlide;
-            } else if (currentSlide > maxSlide) {
-                currentSlide = 0;
-            }
-
-            updateSlidePosition();
-            resetAutoSlide();
-        }
+    const totalSlides = sliderImages.length;
+    const maxSlide = Math.max(0, totalSlides - slidesPerView);
+    
+    currentSlide += direction;
+    
+    if (currentSlide < 0) {
+        currentSlide = maxSlide;
+    } else if (currentSlide > maxSlide) {
+        currentSlide = 0;
+    }
+    
+    updateSlidePosition();
+    resetAutoSlide();
+}
 
         function goToSlide(index) {
             currentSlide = index;
